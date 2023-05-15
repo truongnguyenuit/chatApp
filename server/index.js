@@ -3,6 +3,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 
 const authRouter = require('./routes/auth')
+const chatRouter = require('./routes/chat')
 // const customerRouter = require('./routes/customer')
 
 const cors = require('cors')
@@ -29,6 +30,7 @@ app.use(cors({
 
 app.use(express.json())
 app.use('/api/auth', authRouter)
+app.use('/api/chat', chatRouter)
 // app.use('/api/customer', customerRouter)
 
 
