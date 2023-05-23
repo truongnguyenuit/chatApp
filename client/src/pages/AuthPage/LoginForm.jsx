@@ -2,33 +2,58 @@ import React, { useState } from 'react'
 import { Input, Button, notification } from 'antd'
 import { EyeInvisibleOutlined, EyeTwoTone, CheckCircleOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const LoginForm = () => {
+  const navigate = useNavigate()
   const [toast, toastHolder] = notification.useNotification();
   const [loginInfo, setLoginInfo] = useState({
     email: '',
     password: '',
-    loading: false,
   })
+  const [loading, setLoading] = useState(false)
 
   const submitHandler = async () => {
-    setLoginInfo({...loginInfo, loading: true})
-    const response = await axios.post('http://localhost:5000/api/auth/login', loginInfo)
-    setLoginInfo({...loginInfo, loading: false})
+    try {
+      setLoading(true)
+      const response = await axios.post(`http://localhost:5000/api/auth/login`, loginInfo)
+      
+      toast.open({
+        message: "Thông báo",
+        description: response.data.message,
+        icon: (
+          <CheckCircleOutlined
+            style={{
+              color: '#00FF7F',
+            }}
+          />
+        ),
+      })
 
-    toast.open({
-      message: "Thông báo",
-      description: response.data.message,
-      icon: (
-        <CheckCircleOutlined 
-          style={{
-            color: '#00FF7F',
-          }}
-        />
-      ),
-    })
+      localStorage.setItem("userInfo", JSON.stringify(response.data));
 
-    if(response.data.success) {
-      localStorage.setItem('accessToken', 'myVarValue');
+      setLoading(false)
+
+      try {
+        await navigate("/chat");
+      } catch (error) {
+        console.error(error);
+      }
+
+    } catch (error) {
+
+      setLoading(false)
+      console.log("hehe", error)
+      toast.open({
+        message: "Thông báo",
+        description: error.response.data.message,
+        icon: (
+          <CheckCircleOutlined
+            style={{
+              color: '#00FF7F',
+            }}
+          />
+        ),
+      })
     }
   }
 
@@ -60,7 +85,7 @@ const LoginForm = () => {
         />
       </div>
       <div className="rounded-md overflow-hidden">
-        <Button type="primary" block loading={loginInfo.loading} onClick={() => submitHandler()}>Login</Button>
+        <Button type="primary" block loading={loading} onClick={() => submitHandler()}>Login</Button>
       </div>
       {toastHolder}
     </div>

@@ -6,7 +6,6 @@ const router = express.Router()
 
 router.post('/', verifyToken, async (req, res) => {
 
-  console.log("hehee", req.user._id)
   const { userId } = req.body;
 
   if (!userId) {

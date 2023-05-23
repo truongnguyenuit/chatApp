@@ -2,8 +2,8 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "name" : "admin",
-  "email": "truong@gmail.com",
+  "name" : "nguyen",
+  "email": "truong2@gmail.com",
   "password" : "admin",
   "pic": "haha"
 }
@@ -12,21 +12,26 @@ POST http://localhost:5000/api/auth/login
 Content-Type:  application/json
 
 {
-  "name": "admin",
+  "email": "truong@gmail.com",
   "password": "admin"
 }
 ###
-POST http://localhost:5000/api/chat
+GET http://localhost:5000/api/auth?search=aa  
 Content-Type:  application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDVjYWNjMzlkOTE0NWI0NTE2N2U3OTEiLCJpYXQiOjE2ODM5NjY1Njd9.q6jDNzib7elbYtlfQgSJnoSk-oLrMpBAPi3WsEokdas
 
+###
+POST http://localhost:5000/api/chat
+Content-Type:  application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDYwODUyZWIyZDAxMTY4YWZlNzJjNjUiLCJpYXQiOjE2ODQ1NTg5Mzh9.PBspvR0N0EDF_8uXQgZLRz-ONKmTqi5SjenodBKT0Es
+
 {
-  "userId": "645b822f4cb7bb5a5d353272"
+  "userId": "645b82a14cb7bb5a5d353275"
 }
 ###
 GET http://localhost:5000/api/chat/
 Content-Type:  application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDVjYWNjMzlkOTE0NWI0NTE2N2U3OTEiLCJpYXQiOjE2ODM5NjY1Njd9.q6jDNzib7elbYtlfQgSJnoSk-oLrMpBAPi3WsEokdas
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDYwODUyZWIyZDAxMTY4YWZlNzJjNjUiLCJpYXQiOjE2ODQ1NTc2Mzl9.inaVk7mODMFM8LE_jKZ4ybtWSymBNYIW3zM5fPPvG_E
 ###
 POST http://localhost:5000/api/chat/group
 Content-Type:  application/json
@@ -63,3 +68,16 @@ Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDVjY
   "chatId":"64604b0b5cdc399ed609cd52",
   "userId":"645b822f4cb7bb5a5d353274"
 }
+###
+POST http://localhost:5000/api/message
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDYwODUyZWIyZDAxMTY4YWZlNzJjNjUiLCJpYXQiOjE2ODQ2NTEwMjV9.J7m2uPSiuAHLbx1HZ_eD4KuG0zQo9qTJfoDOs8Ehpcw
+ 
+{
+  "content": "hehe test",
+  "chatId": "646873afbf8f45dc7b1c1b03"
+}
+###
+GET http://localhost:5000/api/message/646873afbf8f45dc7b1c1b03
+Content-Type:  application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NDVjYWNjMzlkOTE0NWI0NTE2N2U3OTEiLCJpYXQiOjE2ODM5NjY1Njd9.q6jDNzib7elbYtlfQgSJnoSk-oLrMpBAPi3WsEokdas
