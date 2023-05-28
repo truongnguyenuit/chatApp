@@ -8,6 +8,9 @@ import ChatLoading from './ChatLoading';
 import setAuthToken from '../untils/setAuthToken';
 import { getSender } from './../config/chatLogic';
 import GroupChatModal from './GroupChatModal';
+var socket, selectedChatCompare;
+import io from "socket.io-client";
+import { ENDPOINT } from './../pages/AuthPage/AuthPage';
 
 const MyChats = ({ fetchAgain }) => {
   const [loggedUser, setLoggedUser] = useState();
@@ -19,9 +22,8 @@ const MyChats = ({ fetchAgain }) => {
 
   const fetchChats = async () => {
     try {
-
       setAuthToken(user.token)
-      const { data } = await axios.get("http://localhost:5000/api/chat/");
+      const { data } = await axios.get(`${ENDPOINT}/api/chat/`);
       setChats(data.chats)
 
     } catch (error) {
@@ -37,6 +39,7 @@ const MyChats = ({ fetchAgain }) => {
   };
 
   useEffect(() => {
+    
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
   }, [fetchAgain]);
@@ -101,14 +104,14 @@ const MyChats = ({ fetchAgain }) => {
                 borderRadius="lg"
                 key={chat._id}
               >
-                <Text>
+                <Text mb='0px'>
                   {!chat.isGroupChat
                     ? getSender(loggedUser, chat.users)
                     : chat.chatName}
-
+                    {/* {chat.chatName} */}
                 </Text>
                 {chat.latestMessage && (
-                  <Text fontSize="xs">
+                  <Text fontSize="xs" mb='0px'>
                     <b>{chat.latestMessage.sender.name} : </b>
                     {chat.latestMessage.content.length > 50
                       ? chat.latestMessage.content.substring(0, 51) + "..."

@@ -20,6 +20,7 @@ import { ChatState } from "../Context/ChatProvider";
 import UserBadgeItem from './userAvatar/UserBadgeItem'
 import UserListItem from "./userAvatar/UserListItem";
 import setAuthToken from "../untils/setAuthToken";
+import { ENDPOINT } from './../pages/AuthPage/AuthPage';
 
 const GroupChatModal = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -56,8 +57,7 @@ const GroupChatModal = ({ children }) => {
     try {
       setLoading(true);
       setAuthToken(user.token)
-      const { data } = await axios.get(`http://localhost:5000/api/auth?search=${search}`);
-      console.log(data);
+      const { data } = await axios.get(`${ENDPOINT}/api/auth?search=${search}`);
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -91,7 +91,7 @@ const GroupChatModal = ({ children }) => {
     try {
       setAuthToken(user.token)
       const { data } = await axios.post(
-        `http://localhost:5000/api/chat/group`,
+        `${ENDPOINT}/api/chat/group`,
         {
           name: groupChatName,
           users: JSON.stringify(selectedUsers.map((u) => u._id)),

@@ -1,124 +1,161 @@
-import React, { useState } from 'react'
-import { Input, Button, notification } from 'antd'
-import { EyeInvisibleOutlined, EyeTwoTone, CheckCircleOutlined} from '@ant-design/icons';
-import axios from 'axios';
+import React from "react";
+import { Button } from "@chakra-ui/button";
+import { FormControl, FormLabel } from "@chakra-ui/form-control";
+import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
+import { VStack } from "@chakra-ui/layout";
+import { useToast } from "@chakra-ui/toast";
+import axios from "axios";
+import { useState } from "react";
+import { ENDPOINT } from './AuthPage';
+import { useNavigate } from 'react-router-dom';
+import { ChatState } from './../../Context/ChatProvider';
 
-const RegisterForm = (navbar) => {
-  console.log(navbar)
-  const [toast, toastHolder] = notification.useNotification();
 
-  const [registerInfo, setRegisterInfo] = useState({
-    name: '',
-    email: '',
-    confirmPassword: '',
-    password: '',
-    pic: '',
-    loading: false
-  })
+const RegisterForm = () => {
+  const [show, setShow] = useState(false);
+  const handleClick = () => setShow(!show);
+  const toast = useToast();
+
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [confirmpassword, setConfirmpassword] = useState();
+  const [password, setPassword] = useState();
+  const [pic, setPic] = useState();
+  
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
+  const { setUser, setChats } = ChatState()
 
   const submitHandler = async () => {
-    setRegisterInfo({ ...registerInfo, loading: true })
-    const response = await axios.post('http://localhost:5000/api/auth/register', registerInfo)
-    setRegisterInfo({ ...registerInfo, loading: false })
-
-    toast.open({
-      message: "Thông báo",
-      description: response.data.message,
-      icon: (
-        <CheckCircleOutlined 
-          style={{
-            color: '#00FF7F',
-          }}
-        />
-      ),
-    })
- 
-    if(response.success) {
-      navbar(true)
+    if (!name || !email || !password || !confirmpassword || !pic) {
+      toast({
+        title: "Please Fill all the Feilds",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
     }
-  }
+    if (password !== confirmpassword) {
+      toast({
+        title: "Passwords Do Not Match",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        `${ENDPOINT}/api/auth/register`,
+        {
+          name,
+          email,
+          password,
+          pic,
+        },
+        config
+      );
+      setUser(data)
+      setChats()
+      localStorage.setItem("userInfo", JSON.stringify(data));
+
+      toast({
+        title: "Registration Successful",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      navigate('/chat')
+
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: error.response.data.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  };
 
   return (
-    <div className="flex flex-col my-[30px] gap-2">
-      <div className="">
-        <div className="">
-          <span className="">Name </span>
-          <span className="text-red-500 font-bold">*</span>
-        </div>
-        <div className="">
+    <VStack spacing="5px">
+      <FormControl id="first-name" isRequired>
+        <FormLabel >Name</FormLabel>
+        <Input
+          placeholder="Enter Your Name"
+          onChange={(e) => setName(e.target.value)}
+        />
+      </FormControl>
+      <FormControl id="email" isRequired>
+        <FormLabel>Email Address</FormLabel>
+        <Input
+          type="email"
+          placeholder="Enter Your Email Address"
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </FormControl>
+      <FormControl id="password" isRequired>
+        <FormLabel>Password</FormLabel>
+        <InputGroup size="md">
           <Input
-            type="text"
-            placeholder="Name"
-            value={registerInfo.name}
-            onChange={(event) => setRegisterInfo({ ...registerInfo, name: event.target.value })}
+            type={show ? "text" : "password"}
+            placeholder="Enter Password"
+            onChange={(e) => setPassword(e.target.value)}
           />
-        </div>
-      </div>
-      <div className="">
-        <div className="">
-          <span className="">Email Address </span>
-          <span className="text-red-500 font-bold">*</span>
-        </div>
-        <div className="">
+          <InputRightElement width="4.5rem">
+            <Button h="1.75rem" size="sm" onClick={handleClick}>
+              {show ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </FormControl>
+      <FormControl id="password" isRequired>
+        <FormLabel>Confirm Password</FormLabel>
+        <InputGroup size="md">
           <Input
-            type="text"
-            placeholder="Username"
-            value={registerInfo.email}
-            onChange={(event) => setRegisterInfo({ ...registerInfo, email: event.target.value })}
-          />
-        </div>
-      </div>
-      <div className="">
-        <div className="">
-          <span className="">Password </span>
-          <span className="text-red-500 font-bold">*</span>
-        </div>
-        <div className="">
-          <Input.Password
-            type="text"
-            placeholder="Password"
-            value={registerInfo.password}
-            onChange={(event) => setRegisterInfo({ ...registerInfo, password: event.target.value })}
-            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-          />
-        </div>
-      </div>
-      <div className="">
-        <div className="">
-          <span className="">Confirm Password </span>
-          <span className="text-red-500 font-bold">*</span>
-        </div>
-        <div className="">
-          <Input.Password
-            type="text"
+            type={show ? "text" : "password"}
             placeholder="Confirm password"
-            value={registerInfo.confirmPassword}
-            onChange={(event) => setRegisterInfo({ ...registerInfo, confirmPassword: event.target.value })}
-            iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+            onChange={(e) => setConfirmpassword(e.target.value)}
           />
-        </div>
-      </div>
-      <div className="">
-        <div className="">
-          <span className="">Picture </span>
-          <span className="text-red-500 font-bold">*</span>
-        </div>
-        <div className="">
-          <Input
-            type="text"
-            placeholder="Picture"
-            value={registerInfo.pic}
-            onChange={(event) => setRegisterInfo({ ...registerInfo, pic: event.target.value })}
-          />
-        </div>
-      </div>
+          <InputRightElement width="4.5rem">
+            <Button h="1.75rem" size="sm" onClick={handleClick}>
+              {show ? "Hide" : "Show"}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </FormControl>
+      <FormControl id="pic" isRequired>
+        <FormLabel>Picture Url</FormLabel>
+        <Input
+          placeholder="Enter Your Email Address"
+          onChange={(e) => setPic(e.target.value)}
+        />
+      </FormControl>
+      <Button
+        colorScheme="blue"
+        width="100%"
+        style={{ marginTop: 15 }}
+        onClick={submitHandler}
+        isLoading={loading}
+      >
+        Sign Up
+      </Button>
+    </VStack>
+  );
+};
 
-      <div className="rounded-md overflow-hidden">
-        <Button type="primary" block loading={registerInfo.loading} onClick={() => submitHandler()}>Register</Button>
-      </div>
-      {toastHolder}
-    </div>
-  )
-}
-
-export default RegisterForm
+export default RegisterForm;

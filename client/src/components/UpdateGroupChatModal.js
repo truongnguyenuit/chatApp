@@ -23,6 +23,7 @@ import { ChatState } from "../Context/ChatProvider";
 import UserBadgeItem from "./userAvatar/UserBadgeItem";
 import UserListItem from "./userAvatar/UserListItem";
 import setAuthToken from './../untils/setAuthToken';
+import { ENDPOINT } from './../pages/AuthPage/AuthPage';
 
 const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -48,9 +49,8 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.get(`http://localhost:5000/api/auth?search=${search}`, config);
+      const { data } = await axios.get(`${ENDPOINT}/api/auth?search=${search}`, config);
       data.slice(0, 4)
-      console.log(data);
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -74,14 +74,12 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       setAuthToken(user.token)
 
       const { data } = await axios.put(
-        `http://localhost:5000/api/chat/rename`,
+        `${ENDPOINT}/api/chat/rename`,
         {
           chatId: selectedChat._id,
           chatName: groupChatName,
         }
       );
-      console.log("asdasdasdasd", data)
-      console.log(data._id);
       setSelectedChat(data);
       setFetchAgain(!fetchAgain);
       setRenameLoading(false);
@@ -125,7 +123,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       setLoading(true);
       setAuthToken(user.token)
       const { data } = await axios.put(
-        `http://localhost:5000/api/chat/groupAdd`,
+        `${ENDPOINT}/api/chat/groupAdd`,
         {
           chatId: selectedChat._id,
           userId: user1._id,
@@ -165,7 +163,7 @@ const UpdateGroupChatModal = ({ fetchMessages, fetchAgain, setFetchAgain }) => {
       setLoading(true);
       setAuthToken(user.token)
       const { data } = await axios.put(
-        `http://localhost:5000/api/chat/groupRemove`,
+        `${ENDPOINT}/api/chat/groupRemove`,
         {
           chatId: selectedChat._id,
           userId: user1._id,

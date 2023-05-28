@@ -5,7 +5,8 @@ const mongoose = require('mongoose')
 const authRouter = require('./routes/auth')
 const chatRouter = require('./routes/chat')
 const messageRouter = require('./routes/message')
-const { Server } = require("socket.io")
+const path = require("path")
+
 
 const cors = require('cors')
 
@@ -34,17 +35,12 @@ app.use('/api/auth', authRouter)
 app.use('/api/chat', chatRouter)
 app.use('/api/message', messageRouter)
 
-const server = app.listen(5000, () => console.log(`server started on port 5000`))
+const port = process.env.PORT || 5000
 
-// const io = new Server(server, {
-//   pingTimeout: 60000,
-//   cors: {
-//     origin: "http://localhost:3000",
-//   }
-// })
+const server = app.listen(port, () => console.log(`server started on port ${port}`))
 
 const io = require("socket.io")(server, {
-  pingTimeout: 60000000,
+  pingTimeout: 600000000,
   cors: {
     origin: "http://localhost:3000",
   }
@@ -55,9 +51,14 @@ io.on("connection", (socket) => {
 
   // after join chat room, just go to a small room with roomID: userID
   socket.on("setup", (userData) => {
-    console.log("join room setup", userData._id)
+    console.log("join chat room new", userData._id)
     socket.join(userData._id);
     socket.emit("connected")
+  })
+
+  socket.on("have new connect", (room) => {
+    console.log("have mssss", room)
+    socket.in(room).emit("have new connect")
   })
 
   // join big room with roomID: chatID
@@ -66,19 +67,18 @@ io.on("connection", (socket) => {
     console.log("user join room: ", room)
   })
 
+  socket.on("typing", (room) => socket.in(room).emit("typing"));
+  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
   socket.on("new message", (newMessageReceived) => {
-    console.log("gui mess",newMessageReceived)
 
     // received message to big room with roomID: chatID           
     var chat = newMessageReceived.chat
-
-    if(!chat.users) return console.log("user is not defined");
-
+    if (!chat.users) return console.log("user is not defined");
     chat.users.forEach((user) => {
-      if(user._id == newMessageReceived.sender._id) return;
-      
-      // send message to small room with roomID: userID
-      // socket.in(user._id).emit("message received", newMessageReceived)
+      if (user._id == newMessageReceived.sender._id) return;
+
+      // send message to big room with roomID: chatID
       socket.in(newMessageReceived.chat._id).emit("message received", newMessageReceived)
     })
   })
@@ -88,3 +88,23 @@ io.on("connection", (socket) => {
     socket.leave(userData._id);
   });
 })
+
+//-----------------deployment----------------------
+
+const __dirname1 = path.resolve()
+
+if (process.env.NODE_ENV === "production") {
+
+  app.use(express.static(path.join(__dirname1, "client/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  })
+
+} else {
+
+  app.get("/", (req, res) => {
+    res.send("API is running succesfully")
+  })
+}
+
+//-----------------deployment---------------------

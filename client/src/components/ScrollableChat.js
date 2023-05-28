@@ -22,7 +22,7 @@ const ScrollableChat = ({ messages }) => {
               isLastMessage(messages, i, user._id)) && (
               <Tooltip label={m.sender.name} placement="bottom-start" hasArrow>
                 <Avatar
-                  mt="7px"
+                  mt="3px"
                   mr={1}
                   size="sm"
                   cursor="pointer"

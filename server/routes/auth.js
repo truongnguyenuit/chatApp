@@ -25,7 +25,16 @@ router.post('/register', async (req, res) => {
       process.env.ACCESS_TOKEN_SECRET,
     )
 
-    res.json({ success: true, message: 'Tạo tài khoản thành công', accessToken })
+    res.json({
+      success: true,
+      message: 'Tạo tài khoản thành công!!!',
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      isAdmin: newUser.isAdmin,
+      pic: newUser.pic,
+      token: accessToken
+    })
 
   } catch (error) {
     console.log(error)
@@ -57,7 +66,8 @@ router.post('/login', async (req, res) => {
     )
 
     res.json({
-      success: true, message: 'Đăng nhập thành công!!!',
+      success: true, 
+      message: 'Đăng nhập thành công!!!',
       _id: user._id,
       name: user.name,
       email: user.email,

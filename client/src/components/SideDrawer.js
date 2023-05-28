@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Box } from '@chakra-ui/layout'
 import {
   Tooltip, HStack, Text,
@@ -31,6 +31,9 @@ import ChatLoading from './ChatLoading';
 import UserListItem from './userAvatar/UserListItem';
 import axios from 'axios'
 import setAuthToken from '../untils/setAuthToken';
+import io from "socket.io-client";
+import { ENDPOINT } from './../pages/AuthPage/AuthPage';
+var socket, selectedChatCompare;
 
 const SideDrawer = () => {
   const toast = useToast()
@@ -73,14 +76,12 @@ const SideDrawer = () => {
 
       setAuthToken(user.token)
 
-      const { data } = await axios.get(` http://localhost:5000/api/auth?search=${search}`);
+      const { data } = await axios.get(`${ENDPOINT}/api/auth?search=${search}`);
 
       setLoading(false);
-      console.log("data", data)
       setSearchResult(data);
 
     } catch (error) {
-      console.log(error)
       toast({
         title: "Error Occured!",
         description: "Failed to Load the Search Results",
@@ -93,15 +94,16 @@ const SideDrawer = () => {
   };
 
   const accessChat = async (userId) => {
-    console.log(userId);
 
     try {
       setLoadingChat(true);
       setAuthToken(user.token)
-      const { data } = await axios.post(`http://localhost:5000/api/chat`, { userId });
-      console.log(data)
-
-      if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+      const { data } = await axios.post(`${ENDPOINT}/api/chat`, { userId });
+      
+      if (!chats.find((c) => c._id === data._id)) {
+        setChats([data, ...chats])
+        socket.emit("have new connect", userId)
+      }
       setSelectedChat(data);
       setLoadingChat(false);
       onClose();
@@ -116,6 +118,9 @@ const SideDrawer = () => {
       });
     }
   };
+  useEffect(() => {
+    socket = io(ENDPOINT);
+  }, []);
   return (
     <>
       <Box
@@ -132,7 +137,7 @@ const SideDrawer = () => {
           <Button variant="ghost" onClick={onOpen}>
             <HStack>
               <span className="fa-solid fa-magnifying-glass"></span>
-              <Text d={{ base: "none", md: 'flex' }} px="4" item>Search User</Text>
+              <Text d={{ base: "none", md: 'flex' }} px="4">Search User</Text>
             </HStack>
           </Button>
         </Tooltip>

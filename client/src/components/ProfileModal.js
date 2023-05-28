@@ -49,6 +49,7 @@ const ProfileModal = ({ user, children }) => {
               justifyContent="space-around"
               gap="15px">
               <Image
+                objectFit="cover"
                 borderRadius="full"
                 boxSize="150px"
                 src={user.pic}
@@ -59,9 +60,6 @@ const ProfileModal = ({ user, children }) => {
             <ModalFooter>
               <Button colorScheme="red" mr={3} onClick={onClose}>
                 Close
-              </Button>
-              <Button variant='ghost'>
-                Secondary Action
               </Button>
             </ModalFooter>
           </ModalContent>
