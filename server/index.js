@@ -13,13 +13,16 @@ const cors = require('cors')
 const connectDB = async () => {
   try {
     mongoose.set('strictQuery', false);
-    await mongoose.connect(
-      `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@chatapp.hsa4hpv.mongodb.net/`,
-    )
-    console.log('MongoDB connected')
+    const connection = await mongoose.connect(
+      `${process.env.MONGODB_URL}`, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      // useFindAndModify: true,
+    })
+    console.log(`MongoDB Connected: ${connection.connection.host}`);
   } catch (error) {
-    console.log(error.message)
-    process.exit(1)
+    console.log(`Error: ${error.message}`);
+    process.exit()
   }
 }
 connectDB()
@@ -34,6 +37,22 @@ app.use(express.json())
 app.use('/api/auth', authRouter)
 app.use('/api/chat', chatRouter)
 app.use('/api/message', messageRouter)
+
+//-----------------deployment----------------------
+
+const __dirname1 = path.resolve()
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "client/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  })
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running succesfully")
+  })
+}
+
+//-----------------deployment---------------------
 
 const port = process.env.PORT || 5000
 
@@ -89,22 +108,3 @@ io.on("connection", (socket) => {
   });
 })
 
-//-----------------deployment----------------------
-
-const __dirname1 = path.resolve()
-
-if (process.env.NODE_ENV === "production") {
-
-  app.use(express.static(path.join(__dirname1, "client/build")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
-  })
-
-} else {
-
-  app.get("/", (req, res) => {
-    res.send("API is running succesfully")
-  })
-}
-
-//-----------------deployment---------------------
