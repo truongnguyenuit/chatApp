@@ -5,7 +5,7 @@
   },
   "deploy": {
     "startCommand": "yarn server",
-    "healthcheckPath": "/",
+    "healthcheckPath": "/server/index.js",
     "healthcheckTimeout": 100,
     "restartPolicyType": "never"
   }
