@@ -14,7 +14,7 @@ const connectDB = async () => {
   try {
     mongoose.set('strictQuery', false);
     const connection = await mongoose.connect(
-      `${process.env.MONGODB_URL}`, {
+      `mongodb+srv://vrttankzz:0918972561@chatapp.hsa4hpv.mongodb.net`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       // useFindAndModify: true,
@@ -54,7 +54,7 @@ if (process.env.NODE_ENV === "production") {
 
 //-----------------deployment---------------------
 
-const server = app.listen(process.env.PORT, () => console.log(`server started on port ${process.env.PORT}`))
+const server = app.listen(5000, () => console.log(`server started on port 5000`))
 
 const io = require("socket.io")(server, {
   pingTimeout: 600000000,
